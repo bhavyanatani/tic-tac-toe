@@ -4,6 +4,7 @@ let newBtn = document.querySelector("#new");
 let msg = document.querySelector("#msg");
 let msgContainer = document.querySelector(".msg-container");
 let mainGame = document.querySelector("#main");
+let turnIndicator = document.querySelector("#turn-indicator");
 
 let turnO = true; 
 let count = 0;
@@ -13,7 +14,6 @@ const WinPatterns = [
     [2, 5, 8], [2, 4, 6], [3, 4, 5], [6, 7, 8]
 ];
 
-
 msgContainer.classList.add("hide");
 
 boxes.forEach((box) => {
@@ -21,60 +21,68 @@ boxes.forEach((box) => {
         if (box.innerText !== "") return;
 
         box.innerText = turnO ? "O" : "X";
+        box.disabled = true;
         turnO = !turnO;
         count++;
-        box.disabled = true;
 
+        turnIndicator.innerText = `Turn: ${turnO ? "O" : "X"}`;  
         checkWinner();
     });
 });
+
 const reset = () => {
     turnO = true;
     count = 0;
     enableBoxes();
 
-    msgContainer.classList.add("hide"); 
+    msgContainer.classList.add("hide");
+    turnIndicator.innerText = "Turn: O"; 
 
     mainGame.style.display = "flex";  
-    mainGame.style.justifyContent = "center"; 
-    mainGame.style.alignItems = "center"; 
 };
-
-
 
 const enableBoxes = () => {
     boxes.forEach(box => {
         box.disabled = false;
         box.innerText = "";
+        box.style.backgroundColor = "#D9DBBC"; 
     });
+};
+
+const disableBoxes = () => {
+    boxes.forEach(box => box.disabled = true);
+};
+
+const highlightWinner = (pattern) => {
+    pattern.forEach(index => {
+        boxes[index].style.backgroundColor = "#FFB400";  
+    });
+
+    setTimeout(() => {
+        showWinner(boxes[pattern[0]].innerText);
+    }, 1000); 
 };
 
 const showWinner = (winner) => {
     msg.innerText = `🎉 Winner: ${winner} 🎉`;
-    msgContainer.classList.remove("hide"); 
+    msgContainer.classList.remove("hide");
     mainGame.style.display = "none";
 };
 
 const checkWinner = () => {
-    let winnerFound = false;
-
     for (let pattern of WinPatterns) {
-        let pos1Val = boxes[pattern[0]].innerText;
-        let pos2Val = boxes[pattern[1]].innerText;
-        let pos3Val = boxes[pattern[2]].innerText;
-
-        if (pos1Val !== "" && pos1Val === pos2Val && pos2Val === pos3Val) {
-            showWinner(pos1Val);
+        let [a, b, c] = pattern;
+        if (boxes[a].innerText && boxes[a].innerText === boxes[b].innerText && boxes[b].innerText === boxes[c].innerText) {
             disableBoxes();
-            winnerFound = true; 
-            return; 
+            highlightWinner(pattern);
+            return;
         }
     }
 
-    if (!winnerFound && count === 9) {
+    if (count === 9) {
         msg.innerText = "It's a Draw! 🤝";
         msgContainer.classList.remove("hide");
-        disableBoxes(); 
+        disableBoxes();
     }
 };
 
