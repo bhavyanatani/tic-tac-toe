@@ -46,6 +46,7 @@ const enableBoxes = () => {
         box.disabled = false;
         box.innerText = "";
         box.style.backgroundColor = "#D9DBBC"; 
+        box.style.removeProperty("background-color");
     });
 };
 
